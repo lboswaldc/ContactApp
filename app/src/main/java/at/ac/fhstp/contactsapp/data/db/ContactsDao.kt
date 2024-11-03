@@ -18,6 +18,9 @@ interface ContactsDao {
     @Delete
     suspend fun deleteContact(contactEntity: ContactEntity)
 
+    @Query("SELECT * FROM contacts WHERE _id = :id")
+    suspend fun findContactById(id: Int): ContactEntity
+
     @Query("SELECT * FROM contacts WHERE age = (SELECT MAX(age) FROM contacts)")
     suspend fun findOldestContact() : ContactEntity
 

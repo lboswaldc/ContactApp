@@ -9,8 +9,13 @@ class ContactRepository(private val contactsDao: ContactsDao) {
 
     fun getAllContacts(): Flow<List<Contact>> {
         return contactsDao.getAllContacts().map {
-            it.map {item -> Contact(item.name, item.telephoneNumber, item.age) }
+            it.map {item -> Contact(item._id, item.name, item.telephoneNumber, item.age) }
         }
+    }
+
+    suspend fun findContactById(id: Int): Contact {
+        val item = contactsDao.findContactById(id)
+        return Contact(item._id, item.name, item.telephoneNumber, item.age)
     }
 
     suspend fun insertContact(contact: Contact) {
@@ -18,7 +23,7 @@ class ContactRepository(private val contactsDao: ContactsDao) {
     }
 
     suspend fun addRandomContact() {
-        insertContact(Contact(names.random(), "+4357894", 45))
+        insertContact(Contact(0, names.random(), "+4357894", 45))
     }
 
     val names = listOf(
@@ -31,6 +36,7 @@ class ContactRepository(private val contactsDao: ContactsDao) {
     fun createContacts(): List<Contact> {
         val contacts = (1..20).map {
             Contact(
+                0,
                 "${names.random()} $it",
                 "+43 123456$it",
                 25 + it

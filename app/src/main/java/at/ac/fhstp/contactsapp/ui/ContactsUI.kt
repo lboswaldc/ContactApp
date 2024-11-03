@@ -20,11 +20,50 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import at.ac.fhstp.contactsapp.data.Contact
 import at.ac.fhstp.contactsapp.ui.theme.Typography
 
+enum class ContactRoutes(val route: String) {
+    Home("home"),
+    Detail("items/{itemId}")
+}
+
 @Composable
-fun ContactsApp(modifier: Modifier = Modifier, contactsViewModel: ContactsViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun ContactsApp(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = ContactRoutes.Home.route,
+        modifier = modifier
+    ) {
+        composable(ContactRoutes.Home.route) {
+            ContactsHomeScreen {
+                navController.navigate(ContactRoutes.Detail.route.replace("{itemId}", "$it"))
+            }
+        }
+        composable(
+            route = ContactRoutes.Detail.route,
+            arguments = listOf(navArgument("itemId") {
+                type = NavType.IntType
+            })
+        ) {
+            ContactDetailsScreen()
+        }
+    }
+}
+
+@Composable
+fun ContactsHomeScreen(
+    modifier: Modifier = Modifier,
+    contactsViewModel: ContactsViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onCardClick: (Int) -> Unit
+) {
     val state by contactsViewModel.contactsUiState.collectAsStateWithLifecycle()
 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -39,8 +78,9 @@ fun ContactsApp(modifier: Modifier = Modifier, contactsViewModel: ContactsViewMo
         Spacer(Modifier.height(16.dp))
         LazyColumn {
             itemsIndexed(state.contacts) { index, contact ->
-                    ContactListItem(contact, onCardClick = {
-                    })
+                ContactListItem(contact, onCardClick = {
+                    onCardClick(contact.id)
+                })
             }
         }
         /*Column {
@@ -53,9 +93,11 @@ fun ContactsApp(modifier: Modifier = Modifier, contactsViewModel: ContactsViewMo
 
 @Composable
 fun ContactListItem(contact: Contact, onCardClick: () -> Unit, modifier: Modifier = Modifier) {
-    OutlinedCard(onClick = { onCardClick() }, modifier = modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
+    OutlinedCard(
+        onClick = { onCardClick() }, modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
         Column(Modifier.padding(16.dp)) {
             Text(contact.name, style = Typography.headlineMedium)
         }
@@ -63,9 +105,19 @@ fun ContactListItem(contact: Contact, onCardClick: () -> Unit, modifier: Modifie
 }
 
 @Composable
+fun ContactDetailsScreen(modifier: Modifier = Modifier, contactDetailsViewModel: ContactDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+  val detailUiState by contactDetailsViewModel.detailUiState.collectAsStateWithLifecycle()
+
+  ContactDetails(detailUiState.contact, modifier)
+}
+
+@Composable
 fun ContactDetails(contact: Contact, modifier: Modifier = Modifier) {
-    OutlinedCard(modifier.fillMaxWidth()
-        .padding(8.dp)) {
+    OutlinedCard(
+        modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
         Column(Modifier.padding(16.dp)) {
             Text(contact.name, style = Typography.headlineMedium)
             Row {
@@ -80,11 +132,11 @@ fun ContactDetails(contact: Contact, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun ContactDetailsPreview() {
-    ContactDetails(Contact("Andrea", "+4354897", 28))
+    ContactDetails(Contact(0, "Andrea", "+4354897", 28))
 }
 
 @Preview
 @Composable
 private fun ContactListItemPreview() {
-    ContactListItem(Contact("Andrea", "+4354897", 28), {})
+    ContactListItem(Contact(0, "Andrea", "+4354897", 28), {})
 }
