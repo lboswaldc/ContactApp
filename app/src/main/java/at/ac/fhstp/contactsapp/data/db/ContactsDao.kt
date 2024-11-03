@@ -10,13 +10,16 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ContactsDao {
     @Insert
-    fun addContact(contactEntity: ContactEntity)
+    suspend fun addContact(contactEntity: ContactEntity)
 
     @Update
-    fun updateContact(contactEntity: ContactEntity)
+    suspend fun updateContact(contactEntity: ContactEntity)
 
     @Delete
-    fun deleteContact(contactEntity: ContactEntity)
+    suspend fun deleteContact(contactEntity: ContactEntity)
+
+    @Query("SELECT * FROM contacts WHERE age = (SELECT MAX(age) FROM contacts)")
+    suspend fun findOldestContact() : ContactEntity
 
     @Query("SELECT * from contacts")
     fun getAllContacts(): Flow<List<ContactEntity>>
