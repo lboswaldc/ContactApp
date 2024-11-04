@@ -3,37 +3,21 @@ package at.ac.fhstp.contactsapp.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import at.ac.fhstp.contactsapp.data.ContactRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class ContactsViewModel(val repository: ContactRepository = ContactRepository()) : ViewModel() {
-    private val _contactsUiState = MutableStateFlow(ContactsUiState(emptyList(), null))
-    val contactsUiState = _contactsUiState
+class ContactsViewModel(private val repository: ContactRepository) : ViewModel() {
 
-    init {
-        viewModelScope.launch {
-
-            repository.contacts.collect { data ->
-
-                _contactsUiState.update { oldState ->
-                    oldState.copy(
-                        contacts = data
-                    )
-                }
-
-            }
-
-        }
-    }
+    val contactsUiState = repository.contacts.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        emptyList()
+    )
 
     fun onAddButtonClicked() {
-        repository.addRandomContact()
-    }
-
-    fun onCardClick(index: Int) {
-        _contactsUiState.update {
-            it.copy(selectedCardIndex = index)
+        viewModelScope.launch {
+            repository.addRandomContact()
         }
     }
 }
