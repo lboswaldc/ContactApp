@@ -27,7 +27,10 @@ import at.ac.fhstp.contactsapp.data.Contact
 import at.ac.fhstp.contactsapp.ui.theme.Typography
 
 @Composable
-fun ContactsApp(modifier: Modifier = Modifier, contactsViewModel: ContactsViewModel = viewModel()) {
+fun ContactsApp(
+    modifier: Modifier = Modifier,
+    contactsViewModel: ContactsViewModel = viewModel(factory = AppViewModelProviderFactory.Factory)
+) {
     val state by contactsViewModel.contactsUiState.collectAsStateWithLifecycle()
 
     Log.i("ContactsApp", "Selected: ${state.selectedCardIndex}")
@@ -90,11 +93,11 @@ fun ContactDetails(contact: Contact, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun ContactDetailsPreview() {
-    ContactDetails(Contact("Andrea", "+4354897", 28))
+    ContactDetails(Contact(0, "Andrea", "+4354897", 28))
 }
 
 @Preview
 @Composable
 private fun ContactListItemPreview() {
-    ContactListItem(Contact("Andrea", "+4354897", 28), {})
+    ContactListItem(Contact(0, "Andrea", "+4354897", 28), {})
 }
