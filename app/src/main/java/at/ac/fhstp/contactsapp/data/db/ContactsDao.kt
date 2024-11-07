@@ -11,21 +11,21 @@ import kotlinx.coroutines.flow.Flow
 interface ContactsDao {
 
     @Insert
-    fun addContact(contactEntity: ContactEntity)
+    suspend fun addContact(contactEntity: ContactEntity)
     // INSERT INTO contacts (name, phone) VALUES ('Max',..)
 
     @Update
-    fun updateContact(contactEntity: ContactEntity)
+    suspend fun updateContact(contactEntity: ContactEntity)
     // UPDATE contacts set name = 'Anna', ...
 
     @Delete
-    fun deleteContact(contactEntity: ContactEntity)
+    suspend fun deleteContact(contactEntity: ContactEntity)
     // DELETE FROM contacts WHERE _id = ..
 
     @Query("SELECT * FROM contacts")
     fun findAllContacts(): Flow<List<ContactEntity>>
 
     @Query("SELECT * FROM contacts WHERE name = :contactName")
-    fun findAllContactsByName(contactName: String): Flow<List<ContactEntity>>
+    suspend fun findAllContactsByName(contactName: String): List<ContactEntity>
 
 }

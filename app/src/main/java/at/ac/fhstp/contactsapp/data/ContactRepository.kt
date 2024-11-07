@@ -1,43 +1,24 @@
 package at.ac.fhstp.contactsapp.data
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import at.ac.fhstp.contactsapp.data.db.ContactEntity
+import at.ac.fhstp.contactsapp.data.db.ContactsDao
+import kotlinx.coroutines.flow.map
 
-class ContactRepository {
+class ContactRepository(private val contactsDao: ContactsDao) {
     val names = listOf(
         "Max",
         "Tom",
         "Anna",
         "Matt"
     )
-    private val _contacts = MutableStateFlow(createContacts())
-    val contacts = _contacts.asStateFlow()
 
-    fun createContacts(): List<Contact> {
-        val contacts = (1..20).map {
-            Contact(
-                "${names.random()} $it",
-                "+43 123456$it",
-                25 + it
-            )
+    val contacts = contactsDao.findAllContacts().map { list ->
+        list.map { entity ->
+            Contact(entity._id, entity.name, entity.telephoneNumber, entity.age)
         }
-        /* another way of writing it
-        val contactList = mutableListOf<Contact>()
-        for (i in 1..15) {
-            val contact = Contact(
-                "Contact $i",
-                "+43123456$i",
-                25 + i
-            )
-            contactList.add(contact)
-        } */
-        return contacts
     }
 
-    fun addRandomContact() {
-        _contacts.update { oldList ->
-            oldList + Contact(names.random(), "+4357894", 45)
-        }
+    suspend fun addRandomContact() {
+        contactsDao.addContact(ContactEntity(0, names.random(), "+4357894", 45))
     }
 }
