@@ -9,6 +9,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ContactsViewModel(val repository: ContactRepository) : ViewModel() {
+
+    init {
+        viewModelScope.launch {
+            repository.loadInitialContacts()
+        }
+    }
+
+
     val contactsUiState = repository.getAllContacts()
         .map { ContactsUiState(it) }
         .stateIn(

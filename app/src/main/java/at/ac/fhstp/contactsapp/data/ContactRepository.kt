@@ -1,11 +1,27 @@
 package at.ac.fhstp.contactsapp.data
 
+import android.util.Log
 import at.ac.fhstp.contactsapp.data.db.ContactEntity
 import at.ac.fhstp.contactsapp.data.db.ContactsDao
+import at.ac.fhstp.contactsapp.data.remote.ContactsRemoteService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ContactRepository(private val contactsDao: ContactsDao) {
+class ContactRepository(private val contactsDao: ContactsDao, private val contactsRemoteService: ContactsRemoteService) {
+
+    suspend fun loadInitialContacts() {
+        try {
+            val contactDtoList = contactsRemoteService.getAllContacts()
+            contactDtoList.map {
+                Contact(0, it.name, "${it.telephoneNumber}", it.age)
+            }.forEach {
+                insertContact(it)
+            }
+        } catch (e: Exception) {
+            Log.e("Repository", "Something went wrong! ${e.message}", e)
+        }
+
+    }
 
     fun getAllContacts(): Flow<List<Contact>> {
         return contactsDao.getAllContacts().map {
@@ -32,18 +48,5 @@ class ContactRepository(private val contactsDao: ContactsDao) {
         "Anna",
         "Matt"
     )
-
-    fun createContacts(): List<Contact> {
-        val contacts = (1..20).map {
-            Contact(
-                0,
-                "${names.random()} $it",
-                "+43 123456$it",
-                25 + it
-            )
-        }
-        return contacts
-    }
-
 
 }
