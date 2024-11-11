@@ -112,12 +112,12 @@ fun ContactListItem(contact: Contact, onCardClick: () -> Unit, modifier: Modifie
 }
 
 
+
 @Composable
 fun ContactDetailView(
     contactDetailViewModel: ContactDetailViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val state by contactDetailViewModel.contactDetailUiState.collectAsStateWithLifecycle()
-
     ContactDetails(state.contact)
 }
 

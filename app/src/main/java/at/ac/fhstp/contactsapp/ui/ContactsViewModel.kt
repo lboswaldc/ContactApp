@@ -15,6 +15,12 @@ class ContactsViewModel(private val repository: ContactRepository) : ViewModel()
         emptyList()
     )
 
+    init {
+        viewModelScope.launch {
+            repository.loadInitialContacts()
+        }
+    }
+
     fun onAddButtonClicked() {
         viewModelScope.launch {
             repository.addRandomContact()
