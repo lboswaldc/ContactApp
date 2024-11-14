@@ -23,13 +23,53 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import at.ac.fhstp.contactsapp.data.Contact
 import at.ac.fhstp.contactsapp.ui.theme.Typography
 
+enum class Routes(val route: String) {
+    Home("list"),
+    Details("details/{contactId}")
+}
+
 @Composable
-fun ContactsApp(
+fun ContactsApp(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+
+    NavHost(navController, Routes.Home.route, modifier=modifier) {
+        composable(Routes.Home.route) {
+            ContactsListScreen() {
+                contactId -> navController.navigate("details/$contactId")
+            }
+        }
+        composable(Routes.Details.route, arguments = listOf(navArgument("contactId") {
+            type = NavType.IntType
+        })) {
+            ContactDetailScreen()
+        }
+    }
+}
+
+@Composable
+fun ContactDetailScreen(
     modifier: Modifier = Modifier,
-    contactsViewModel: ContactsViewModel = viewModel(factory = AppViewModelProviderFactory.Factory)
+    contactDetailViewModel: ContactDetailViewModel = viewModel(factory = AppViewModelProviderFactory.Factory)
+) {
+    val state by contactDetailViewModel.contactDetailUiState.collectAsStateWithLifecycle()
+
+    ContactDetails(state.contact, modifier)
+}
+
+
+@Composable
+fun ContactsListScreen(
+    modifier: Modifier = Modifier,
+    contactsViewModel: ContactsViewModel = viewModel(factory = AppViewModelProviderFactory.Factory),
+    onContactClick: (Int) -> Unit,
 ) {
     val state by contactsViewModel.contactsUiState.collectAsStateWithLifecycle()
 
@@ -51,6 +91,7 @@ fun ContactsApp(
                     ContactDetails(contact)
                 } else {
                     ContactListItem(contact, onCardClick = {
+                        onContactClick(contact.id)
                         contactsViewModel.onCardClick(index)
                     })
                 }
@@ -77,8 +118,10 @@ fun ContactListItem(contact: Contact, onCardClick: () -> Unit, modifier: Modifie
 
 @Composable
 fun ContactDetails(contact: Contact, modifier: Modifier = Modifier) {
-    OutlinedCard(modifier.fillMaxWidth()
-        .padding(8.dp)) {
+    OutlinedCard(
+        modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
         Column(Modifier.padding(16.dp)) {
             Text(contact.name, style = Typography.headlineMedium)
             Row {

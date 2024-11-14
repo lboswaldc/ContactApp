@@ -14,7 +14,7 @@ class ContactsViewModel(val repository: ContactRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-
+            repository.addInitialContacts()
             repository.contacts.collect { data ->
 
                 _contactsUiState.update { oldState ->
