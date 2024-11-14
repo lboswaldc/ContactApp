@@ -21,4 +21,9 @@ class ContactRepository(private val contactsDao: ContactsDao) {
     suspend fun addRandomContact() {
         contactsDao.addContact(ContactEntity(0, names.random(), "+4357894", 45))
     }
+
+    suspend fun findContactById(contactId: Int) : Contact {
+        val entity = contactsDao.findContactById(contactId)
+        return Contact(entity._id, entity.name, entity.telephoneNumber, entity.age)
+    }
 }

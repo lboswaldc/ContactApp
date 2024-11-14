@@ -22,6 +22,9 @@ interface ContactsDao {
     suspend fun deleteContact(contactEntity: ContactEntity)
     // DELETE FROM contacts WHERE _id = ..
 
+    @Query("SELECT * FROM contacts WHERE _id = :contactId")
+    suspend fun findContactById(contactId: Int): ContactEntity
+
     @Query("SELECT * FROM contacts")
     fun findAllContacts(): Flow<List<ContactEntity>>
 
