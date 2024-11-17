@@ -18,7 +18,7 @@ data class ContactDetailUi(
 
 class ContactDetailsViewModel(savedStateHandle: SavedStateHandle, private val contactRepository: ContactRepository): ViewModel() {
 
-    private val itemId: Int = checkNotNull(savedStateHandle["itemId"])
+    private val contactId: Int = checkNotNull(savedStateHandle["contactId"])
 
     private val _detailUiState = MutableStateFlow(ContactDetailUi())
     val detailUiState = _detailUiState.asStateFlow()
@@ -26,7 +26,7 @@ class ContactDetailsViewModel(savedStateHandle: SavedStateHandle, private val co
     init {
         viewModelScope.launch {
             val contact = withContext(Dispatchers.IO) {
-                contactRepository.findContactById(itemId)
+                contactRepository.findContactById(contactId)
             }
             _detailUiState.update {
                 ContactDetailUi(contact)

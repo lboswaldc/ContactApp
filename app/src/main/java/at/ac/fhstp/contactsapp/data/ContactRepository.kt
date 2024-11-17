@@ -42,6 +42,10 @@ class ContactRepository(private val contactsDao: ContactsDao, private val contac
         insertContact(Contact(0, names.random(), "+4357894", 45))
     }
 
+    suspend fun updateContact(contact: Contact) {
+        contactsDao.updateContact(ContactEntity(contact.id, contact.name, contact.telephoneNumber, contact.age))
+    }
+
     val names = listOf(
         "Max",
         "Tom",
