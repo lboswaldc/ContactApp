@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +34,7 @@ import androidx.navigation.navArgument
 import at.ac.fhstp.contactsapp.data.Contact
 import at.ac.fhstp.contactsapp.ui.edit.ContactEditScreen
 import at.ac.fhstp.contactsapp.ui.theme.Typography
+import coil3.compose.AsyncImage
 
 enum class ContactRoutes(val route: String) {
     Home("home"),
@@ -120,6 +123,12 @@ fun ContactListItem(contact: Contact, onCardClick: () -> Unit, onEditClick: ()->
             .padding(8.dp)
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            // https://randomuser.me/api/portraits/lego/9.jpg
+            AsyncImage(
+                model = "https://randomuser.me/api/portraits/lego/${(1..9).random()}.jpg",
+                contentDescription = "profile_picture",
+                modifier = Modifier.clip(CircleShape)
+            )
             Text(contact.name, style = Typography.headlineMedium)
             IconButton(onEditClick) {
                 Icon(Icons.Outlined.Edit, "Edit contact")
