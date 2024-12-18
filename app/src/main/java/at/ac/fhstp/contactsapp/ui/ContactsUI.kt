@@ -42,6 +42,11 @@ enum class ContactRoutes(val route: String) {
     Edit("contacts/{contactId}/edit")
 }
 
+// Functions that are marked with @Composable
+// are functions that show some sort of UI or use other @Composables
+
+// modifier: Modifier -> parameter modifier of type Modifier (interface)
+// Modifier = Modifier -> default value of parameter is Modifier (object)
 @Composable
 fun ContactsApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
@@ -52,15 +57,17 @@ fun ContactsApp(modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         composable(ContactRoutes.Home.route) {
-            ContactsHomeScreen(onEditClick = {
-                navController.navigate(ContactRoutes.Edit.route.replace("{contactId}", "$it"))
-            }) {
-                navController.navigate(ContactRoutes.Detail.route.replace("{contactId}", "$it"))
-            }
+            ContactsHomeScreen(
+                onEditClick = {
+                    navController.navigate(ContactRoutes.Edit.route.replace("{contactId}", "$it"))
+                },
+                onCardClick = {
+                    navController.navigate(ContactRoutes.Detail.route.replace("{contactId}", "$it"))
+                })
         }
         composable(
             route = ContactRoutes.Detail.route,
-            arguments = listOf(navArgument("contactId") {
+            arguments = listOf(navArgument("contactId") { // navArgument name has to match {contactId} in the Detail.route
                 type = NavType.IntType
             })
         ) {
@@ -83,7 +90,7 @@ fun ContactsApp(modifier: Modifier = Modifier) {
 fun ContactsHomeScreen(
     modifier: Modifier = Modifier,
     contactsViewModel: ContactsViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onEditClick: (Int) -> Unit,
+    onEditClick: (Int) -> Unit, // onEditClick parameter is function that takes an Integer and returns Nothing(Unit)
     onCardClick: (Int) -> Unit
 ) {
     val state by contactsViewModel.contactsUiState.collectAsStateWithLifecycle()
@@ -116,7 +123,14 @@ fun ContactsHomeScreen(
 }
 
 @Composable
-fun ContactListItem(contact: Contact, onCardClick: () -> Unit, onEditClick: ()->Unit, modifier: Modifier = Modifier) {
+fun ContactListItem(
+    contact: Contact,
+    onCardClick: () -> Unit,
+    onEditClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+
     OutlinedCard(
         onClick = { onCardClick() }, modifier = modifier
             .fillMaxWidth()
@@ -138,10 +152,13 @@ fun ContactListItem(contact: Contact, onCardClick: () -> Unit, onEditClick: ()->
 }
 
 @Composable
-fun ContactDetailsScreen(modifier: Modifier = Modifier, contactDetailsViewModel: ContactDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
-  val detailUiState by contactDetailsViewModel.detailUiState.collectAsStateWithLifecycle()
+fun ContactDetailsScreen(
+    modifier: Modifier = Modifier,
+    contactDetailsViewModel: ContactDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
+    val detailUiState by contactDetailsViewModel.detailUiState.collectAsStateWithLifecycle()
 
-  ContactDetails(detailUiState.contact, modifier)
+    ContactDetails(detailUiState.contact, modifier)
 }
 
 @Composable

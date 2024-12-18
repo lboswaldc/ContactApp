@@ -53,22 +53,30 @@ android {
 
 dependencies {
 
+    // AsyncImage, for showing images from localstorage or Internet
     implementation("io.coil-kt.coil3:coil-compose:3.0.4")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
 
+    // NavHost, rememberNavController(); for navigating within the app
     implementation(libs.androidx.navigation.compose)
 
+    // Room, @Entity, @Dao, @Insert, @Update, @Database
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+    // Takes the Dao and Databasefiles and creates the java implementations for them (_Impl)
+    // kapt is also possible here
     ksp("androidx.room:room-compiler:$room_version")
 
     // Retrofit
+    // Loading data from the internet; @GET(, @POST(, Retrofit.Builder()
     val retrofit_version = "2.11.0"
     implementation("com.squareup.retrofit2:converter-kotlinx-serialization:$retrofit_version")
     implementation("com.squareup.retrofit2:retrofit:$retrofit_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
+
+    // Basic Android with Jetpack Compose libraries
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
